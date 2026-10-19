@@ -1,0 +1,7 @@
+[credential "https://github.com"]
+    helper = !pass git/danyelaristizabal@github
+[user]
+	email = danyelaristizabal@hotmail.com
+	name = danyelaristizabal
+[push]
+	autoSetupRemote = true
