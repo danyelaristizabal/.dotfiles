@@ -1,0 +1,7 @@
+[Unit]
+Description=Battery threshold notifier
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/battery_notify.sh
+
