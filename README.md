@@ -52,7 +52,8 @@ flowchart TD
 On a brand new Mac you can't `git clone` before installing the CLT. Use `curl` instead — it's always available:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/danyelaristizabal/.dotfiles/main/macosx/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/danyelaristizabal/.dotfiles/refs/heads/master/macosx/install.sh)"
+
 ```
 
 The script will install Xcode Command Line Tools, clone this repo, and set everything up automatically.
