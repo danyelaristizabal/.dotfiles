@@ -1,51 +1,111 @@
 #!/bin/bash
 
-# Arch Linux Installation Script
-# Installs packages using pacman and AUR helper (yay)
+# macOS Installation Script
+# Installs Homebrew, formulae, casks, and sets up dotfiles
 
 # --- CONFIGURATION ---
 DOTFILES_DIR="$HOME/.dotfiles"
 STOW_TARGET="$HOME"
 STOW_PACKAGES=(tmux gitconfig nvim wezterm zprofile zshrc)
 
-# Core packages available in official Arch repositories
-PACMAN_PACKAGES=(
+# Top-level formulae (deps are pulled in automatically)
+BREW_PACKAGES=(
+    # Dev tools
     "git"
+    "gh"
     "go"
+    "rust"
+    "rustup"
+    "yarn"   # js package manager alternative to npm
+    "python" # latest stable; homebrew resolves the version
+
+    # Neovim + LSP / tooling
     "neovim"
-    "nodejs"
-    "npm"
-    "python"
-    "python-pip"
-    "ripgrep"
-    "ruby"
+    "luarocks"          # Lua package manager; neovim needs it for some plugins
+    "luaver"            # Lua version manager (like nvm but for Lua)
+    "markdownlint-cli2" # lints .md files for style/formatting issues
+    "marksman"          # markdown LSP: go-to-definition and completions in .md files
+    "tree-sitter"
+
+    # Shell / terminal utilities
     "stow"
     "tmux"
+    "tmuxinator" # manages tmux sessions via YAML; define layouts, spin up with one command
+    "ripgrep"    # fast grep replacement; used by neovim Telescope/fzf for file search
+    "fd"         # fast and friendly replacement for find; used by neovim plugins
+    "bat"
+    "btop"
     "tree"
-    "wget"
-    "yarn"
-    "gnome-keyring"
-    "zsh"
-    "unbound"
-    "luarocks"
-    "lua"
-)
+    "wget"      # download files from URLs; handles recursive downloads and resuming (curl is built-in on macOS)grep"
+    "asciinema" # records terminal sessions and lets you share/replay them as text animations
+    "yazi"      # terminal file manager
 
-# AUR packages (require AUR helper like yay)
-AUR_PACKAGES=(
+    # Go dev
     "golangci-lint"
     "gotests"
-    "lazygit"
-    "luaver"
-    "mockery"
-    "ollama"
+
+    # Secrets / security
     "pass"
-    "tmuxinator"
-    "tree-sitter"
-    "yazi"
-    "zsh-theme-powerlevel10k-git"
-    "oh-my-zsh-git"
-    "lazydocker"
+    "gnupg"
+
+    # Misc CLI tools
+    "imagemagick" # CLI image conversion/manipulation (resize, format convert, etc.)
+    "plantuml"
+    "pipx" # installs Python CLI tools in isolated envs (won't pollute system Python)
+    "k6"   # load testing
+    "ollama"
+
+    "fzf" # fuzzy finder: ctrl+r for history, ctrl+t for files, alt+c for dirs
+    "gemini-cli"
+    "lazygit"
+    "clippy" # pipes files to clipboard for clean GUI pastes: cat file.txt | clippy
+)
+
+# GUI applications (casks)
+BREW_CASKS=(
+    # Browsers
+    "firefox"
+    "google-chrome"
+    "vivaldi"
+
+    # Development
+    "visual-studio-code"
+    "ghostty" # terminal
+    "docker-desktop"
+    "postman"
+    "sublime-text"
+
+    # AI tools
+    "claude"
+    "codex"
+
+    # Communication
+    "slack"
+    "discord"
+    "telegram"
+    "whatsapp"
+    "zoom"
+
+    # Productivity
+    "raycast"   # spotlight replacement
+    "bitwarden" # password manager
+
+    # Media
+    "spotify"
+    "vlc"
+    "obs"
+
+    # Utilities
+    "utm" # VMs on Apple Silicon
+    "anydesk"
+
+    # Other
+    "anki" # flashcards
+    "tradingview"
+    "halloy" # IRC client
+
+    # VPN
+    "amneziavpn"
 )
 
 TMUX_PLUGIN_PATH="$HOME/.tmux/plugins/tpm"
@@ -57,117 +117,90 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-install_yay() {
-    if ! command_exists yay; then
-        echo "📦 Installing yay AUR helper..."
-        cd /tmp || exit 1
-        git clone https://aur.archlinux.org/yay.git
-        cd yay || exit 1
-        makepkg -si --noconfirm
-        cd "$HOME" || exit 1
-        rm -rf /tmp/yay
+install_homebrew() {
+    if ! command_exists brew; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        # Add brew to PATH for Apple Silicon
+        if [[ $(uname -m) == "arm64" ]]; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >>"$HOME/.zprofile"
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
     else
-        echo "✅ yay already installed"
+        echo "Homebrew already installed"
     fi
 }
 
-install_pacman_packages() {
-    echo "📦 Installing packages with pacman..."
-    sudo pacman -Syu --noconfirm
-    for package in "${PACMAN_PACKAGES[@]}"; do
+install_brew_packages() {
+    echo "Installing brew formulae..."
+    brew update
+    for package in "${BREW_PACKAGES[@]}"; do
         echo "Installing $package..."
-        sudo pacman -S --noconfirm "$package" || echo "⚠️ Failed to install $package"
+        brew install "$package" || echo "Failed to install $package"
     done
 }
 
-install_aur_packages() {
-    if command_exists yay; then
-        echo "📦 Installing AUR packages with yay..."
-        for package in "${AUR_PACKAGES[@]}"; do
-            echo "Installing $package..."
-            yay -S --noconfirm "$package" || echo "⚠️ Failed to install $package"
-        done
-    else
-        echo "⚠️ yay not found. Skipping AUR packages installation."
-    fi
+install_brew_casks() {
+    echo "Installing brew casks..."
+    for cask in "${BREW_CASKS[@]}"; do
+        echo "Installing $cask..."
+        brew install --cask "$cask" || echo "Failed to install $cask"
+    done
 }
 
 clone_tmux_plugin_manager() {
     if [ ! -d "$TMUX_PLUGIN_PATH" ]; then
-        echo "📥 Cloning tmux plugin manager..."
+        echo "Cloning tmux plugin manager..."
         git clone "$TMUX_PLUGIN_REPO" "$TMUX_PLUGIN_PATH"
     else
-        echo "✅ tmux plugin manager already exists"
+        echo "tmux plugin manager already exists"
     fi
 }
 
 stow_packages() {
     if command_exists stow; then
-        echo "🔗 Stowing packages..."
+        echo "Stowing dotfiles..."
         cd "$DOTFILES_DIR" || exit 1
         for package in "${STOW_PACKAGES[@]}"; do
             echo "Stowing $package..."
             stow -t "$STOW_TARGET" -v "$package"
         done
     else
-        echo "⚠️ stow not found. Install it first with: sudo pacman -S stow"
+        echo "stow not found — install it first"
     fi
 }
 
-setup_python_packages() {
-    echo "🐍 Installing Python packages..."
-    pip install --user pipx
-    
-    # Add pipx to PATH if not already there
-    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+setup_fzf() {
+    if command_exists fzf; then
+        if ! grep -q "fzf --zsh" "$HOME/.zshrc" 2>/dev/null; then
+            echo 'eval "$(fzf --zsh)"' >>"$HOME/.zshrc"
+        fi
     fi
 }
 
 setup_node_packages() {
-    echo "📦 Installing global Node.js packages..."
+    echo "Installing global Node.js packages..."
     npm install -g @anthropic-ai/claude-code
 }
 
-# --- MAIN SCRIPT ---
+# --- MAIN ---
 
-echo "🐧 Starting Arch Linux dotfiles installation..."
+echo "Starting macOS dotfiles installation..."
 
-# Update system first
-echo "🔄 Updating system..."
-sudo pacman -Syu --noconfirm
+install_homebrew
 
-# Install yay AUR helper
-install_yay
+brew update && brew upgrade
 
-# Install core packages from official repositories
-install_pacman_packages
+install_brew_packages
+install_brew_casks
 
-# Install AUR packages
-install_aur_packages
-
-# Set up Python environment
-setup_python_packages
-
-# Set up Node.js packages
+setup_fzf
 setup_node_packages
 
-# Clone tmux plugin manager
 clone_tmux_plugin_manager
 
-# Stow dotfiles
 stow_packages
 
-# Set up shell alias
-echo "🔧 Setting up vim alias..."
-if ! grep -q "alias vim='nvim'" ~/.zshrc 2>/dev/null; then
-    echo "alias vim='nvim'" >> ~/.zshrc
-fi
-
-# Enable and start gnome-keyring if not already running
-echo "🔐 Setting up gnome-keyring..."
-systemctl --user enable gnome-keyring-daemon.service || true
-
-echo "✅ Arch Linux installation complete!"
-echo "🔄 Please restart your terminal or run 'source ~/.zshrc' to apply changes"
-echo "📝 Note: Some AUR packages might require manual configuration"
+echo "Installation complete!"
+echo "Run 'source ~/.zshrc' to apply shell changes."

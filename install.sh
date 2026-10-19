@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Common packages that need to be installed on all systems
 COMMON_PACKAGES=(
     "git"
-    "go" 
+    "go"
     "golangci-lint"
     "gotests"
     "lazygit"
@@ -23,7 +23,6 @@ COMMON_PACKAGES=(
     "pass"
     "python"
     "ripgrep"
-    "ruby"
     "stow"
     "tmux"
     "tmuxinator"
@@ -63,38 +62,38 @@ OS=$(detect_os)
 bash "stow.sh"
 
 case $OS in
-    "macosx")
-        echo "🍎 macOS detected - running macOS installer"
-        if [[ -f "$SCRIPT_DIR/macosx/install.sh" ]]; then
-            bash "$SCRIPT_DIR/macosx/install.sh"
-        else
-            echo "❌ macOS installer script not found at $SCRIPT_DIR/macosx/install.sh"
-            exit 1
-        fi
-        ;;
-    "arch")
-        echo "🐧 Arch Linux detected - running Arch installer"
-        if [[ -f "$SCRIPT_DIR/arch/install.sh" ]]; then
-            bash "$SCRIPT_DIR/arch/install.sh"
-        else
-            echo "❌ Arch Linux installer script not found at $SCRIPT_DIR/arch/install.sh"
-            exit 1
-        fi
-        ;;
-    "linux")
-        echo "🐧 Arch Linux detected - running Arch installer"
-        if [[ -f "$SCRIPT_DIR/arch/install.sh" ]]; then
-            bash "$SCRIPT_DIR/arch/install.sh"
-        else
-            echo "❌ Arch Linux installer script not found at $SCRIPT_DIR/arch/install.sh"
-            exit 1
-        fi
-        ;;
-    *)
-        echo "❌ Unsupported operating system: $OSTYPE"
-        echo "Supported systems: macOS, Arch Linux"
+"macosx")
+    echo "🍎 macOS detected - running macOS installer"
+    if [[ -f "$SCRIPT_DIR/macosx/install.sh" ]]; then
+        bash "$SCRIPT_DIR/macosx/install.sh"
+    else
+        echo "❌ macOS installer script not found at $SCRIPT_DIR/macosx/install.sh"
         exit 1
-        ;;
+    fi
+    ;;
+"arch")
+    echo "🐧 Arch Linux detected - running Arch installer"
+    if [[ -f "$SCRIPT_DIR/arch/install.sh" ]]; then
+        bash "$SCRIPT_DIR/arch/install.sh"
+    else
+        echo "❌ Arch Linux installer script not found at $SCRIPT_DIR/arch/install.sh"
+        exit 1
+    fi
+    ;;
+"linux")
+    echo "🐧 Arch Linux detected - running Arch installer"
+    if [[ -f "$SCRIPT_DIR/arch/install.sh" ]]; then
+        bash "$SCRIPT_DIR/arch/install.sh"
+    else
+        echo "❌ Arch Linux installer script not found at $SCRIPT_DIR/arch/install.sh"
+        exit 1
+    fi
+    ;;
+*)
+    echo "❌ Unsupported operating system: $OSTYPE"
+    echo "Supported systems: macOS, Arch Linux"
+    exit 1
+    ;;
 esac
 
 echo "✅ Installation complete!"
