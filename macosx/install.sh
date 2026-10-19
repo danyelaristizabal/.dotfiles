@@ -1,7 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
 # macOS Installation Script
 # Installs Homebrew, formulae, casks, and sets up dotfiles
+
+# --- BOOTSTRAP ---
+
+# Install Xcode Command Line Tools (includes git) if missing
+if ! xcode-select -p &>/dev/null; then
+    echo "Installing Xcode Command Line Tools..."
+    touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+    CLT=$(softwareupdate -l 2>/dev/null \
+        | grep -E '\* Label: Command Line Tools' \
+        | sed 's/^.*Label: //' \
+        | sort -V | tail -n1)
+    softwareupdate -i "$CLT" --verbose
+    rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+else
+    echo "Xcode Command Line Tools already installed"
+fi
+
+# Clone dotfiles if not already present
+if [ ! -d "$HOME/.dotfiles" ]; then
+    git clone https://github.com/danyelaristizabal/.dotfiles.git "$HOME/.dotfiles"
+fi
+
+cd "$HOME/.dotfiles"
 
 # --- CONFIGURATION ---
 DOTFILES_DIR="$HOME/.dotfiles"
