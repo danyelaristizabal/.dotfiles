@@ -106,7 +106,6 @@ BREW_CASKS=(
 
     # Communication
     "slack"
-    "discord"
     "telegram"
     "whatsapp"
     "zoom"
@@ -123,15 +122,12 @@ BREW_CASKS=(
 
     # Utilities
     "utm" # VMs on Apple Silicon
-    "anydesk"
 
     # Other
     "anki" # flashcards
     "tradingview"
-    "halloy" # IRC client
 
-    # VPN
-    "amneziavpn"
+
 )
 
 TMUX_PLUGIN_PATH="$HOME/.tmux/plugins/tpm"
@@ -166,7 +162,7 @@ install_brew_packages() {
             echo "$package already installed, skipping"
         else
             echo "Installing $package..."
-            brew install "$package" || echo "Failed to install $package"
+            yes | brew install "$package" || echo "Failed to install $package"
         fi
     done
 }
@@ -178,7 +174,7 @@ install_brew_casks() {
             echo "$cask already installed, skipping"
         else
             echo "Installing $cask..."
-            brew install --cask "$cask" || echo "Failed to install $cask"
+            yes | brew install --cask "$cask" || echo "Failed to install $cask"
         fi
     done
 }
@@ -195,10 +191,9 @@ clone_tmux_plugin_manager() {
 stow_packages() {
     if command_exists stow; then
         echo "Stowing dotfiles..."
-        cd "$DOTFILES_DIR" || exit 1
         for package in "${STOW_PACKAGES[@]}"; do
             echo "Stowing $package..."
-            stow -t "$STOW_TARGET" -v "$package"
+            stow -d "$DOTFILES_DIR" -t "$STOW_TARGET" -v "$package"
         done
     else
         echo "stow not found — install it first"
@@ -230,7 +225,7 @@ echo "Starting macOS dotfiles installation..."
 
 install_homebrew
 
-brew update && brew upgrade
+brew update
 
 install_brew_packages
 install_brew_casks
