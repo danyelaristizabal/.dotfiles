@@ -183,6 +183,22 @@ install_brew_casks() {
     done
 }
 
+setup_zsh_framework() {
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        echo "Installing oh-my-zsh..."
+        git clone https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"
+    else
+        echo "oh-my-zsh already installed"
+    fi
+
+    if [ ! -d "$HOME/powerlevel10k" ]; then
+        echo "Installing powerlevel10k..."
+        git clone https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k"
+    else
+        echo "powerlevel10k already installed"
+    fi
+}
+
 clone_tmux_plugin_manager() {
     if [ ! -d "$TMUX_PLUGIN_PATH" ]; then
         echo "Cloning tmux plugin manager..."
@@ -236,6 +252,7 @@ setup_mission_control
 setup_fzf
 setup_node_packages
 
+setup_zsh_framework
 clone_tmux_plugin_manager
 
 stow_packages
