@@ -134,5 +134,3 @@ To symlink dotfiles without reinstalling packages:
 cd ~/.dotfiles
 ./stow.sh
 ```
-
-Small change on the readme to check 
