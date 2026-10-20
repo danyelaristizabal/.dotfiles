@@ -30,8 +30,6 @@ cd "$HOME/.dotfiles"
 
 # --- CONFIGURATION ---
 DOTFILES_DIR="$HOME/.dotfiles"
-STOW_TARGET="$HOME"
-STOW_PACKAGES=(tmux gitconfig nvim wezterm zprofile zshrc hammerspoon)
 
 # Top-level formulae (deps are pulled in automatically)
 BREW_PACKAGES=(
@@ -194,10 +192,8 @@ clone_tmux_plugin_manager() {
 stow_packages() {
     if command_exists stow; then
         echo "Stowing dotfiles..."
-        for package in "${STOW_PACKAGES[@]}"; do
-            echo "Stowing $package..."
-            (cd "$DOTFILES_DIR" && stow -t "$STOW_TARGET" -v "$package")
-        done
+        (cd "$DOTFILES_DIR" && bash stow.sh)
+        (cd "$DOTFILES_DIR/macosx" && bash stow.sh)
     else
         echo "stow not found — install it first"
     fi
