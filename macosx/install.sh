@@ -191,11 +191,21 @@ setup_zsh_framework() {
         echo "oh-my-zsh already installed"
     fi
 
-    if [ ! -d "$HOME/powerlevel10k" ]; then
+    # Clone into oh-my-zsh themes dir (where ZSH_THEME looks) and symlink ~/powerlevel10k for direct sources
+    local p10k_theme="$HOME/.oh-my-zsh/custom/themes/powerlevel10k"
+    if [ ! -d "$p10k_theme" ]; then
         echo "Installing powerlevel10k..."
-        git clone https://github.com/romkatv/powerlevel10k.git "$HOME/powerlevel10k"
+        git clone https://github.com/romkatv/powerlevel10k.git "$p10k_theme"
     else
         echo "powerlevel10k already installed"
+    fi
+    [ ! -L "$HOME/powerlevel10k" ] && ln -sf "$p10k_theme" "$HOME/powerlevel10k"
+
+    if [ ! -d "$HOME/.tmuxifier" ]; then
+        echo "Installing tmuxifier..."
+        git clone https://github.com/jimeh/tmuxifier.git "$HOME/.tmuxifier"
+    else
+        echo "tmuxifier already installed"
     fi
 }
 
