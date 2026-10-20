@@ -156,7 +156,7 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
-		lazy = false,
+		event = { "BufReadPost", "BufNewFile", "BufWritePre" },
 		main = "nvim-treesitter.configs",
 		opts = {
 			ensure_installed = { "go", "lua", "c_sharp", "javascript", "graphql", "markdown", "markdown_inline" },
