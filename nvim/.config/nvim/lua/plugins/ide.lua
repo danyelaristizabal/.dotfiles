@@ -41,36 +41,6 @@ return {
 			},
 		},
 	},
-	-- 2) LSP Servers
-	{
-		"neovim/nvim-lspconfig",
-		opts = {
-			folds = {
-				enabled = true,
-			},
-			servers = {
-				gopls = {
-					settings = {
-						gopls = {
-							gofumpt = true,
-							analyses = { unusedparams = true, shadow = true },
-							staticcheck = true,
-						},
-					},
-				},
-				vtsls = {},
-				bashls = {},
-				lua_ls = {
-					settings = {
-						Lua = {
-							diagnostics = { globals = { "vim" } },
-							workspace = { checkThirdParty = false },
-						},
-					},
-				},
-			},
-		},
-	},
 	-- 3) Formatting
 	{
 		"stevearc/conform.nvim",

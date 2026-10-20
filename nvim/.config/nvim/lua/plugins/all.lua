@@ -47,49 +47,53 @@ return {
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			"folke/lazydev.nvim",
-			ft = "lua", -- only load on lua files
+			ft = "lua",
 			opts = {
 				library = {
-					-- See the configuration section for more details
-					-- Load luvit types when the `vim.uv` word is found
 					{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
 				},
 			},
 		},
 		config = function()
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-			local lspconfig = require("lspconfig")
-
-			-- Go
-			lspconfig.gopls.setup({
-				capabilities = capabilities,
+			-- Apply cmp capabilities to all servers
+			vim.lsp.config("*", {
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 			})
 
-			-- Rust
-			lspconfig.rust_analyzer.setup({
-				capabilities = capabilities,
+			vim.lsp.config("gopls", {
+				settings = {
+					gopls = {
+						gofumpt = true,
+						analyses = { unusedparams = true, shadow = true },
+						staticcheck = true,
+					},
+				},
 			})
 
-			-- C#
-			lspconfig.csharp_ls.setup({
-				capabilities = capabilities,
+			vim.lsp.config("lua_ls", {
+				settings = {
+					Lua = {
+						diagnostics = { globals = { "vim" } },
+						workspace = { checkThirdParty = false },
+					},
+				},
 			})
 
-			lspconfig.lua_ls.setup({})
-			lspconfig.ts_ls.setup({})
-			lspconfig.pyright.setup({})
-			lspconfig.marksman.setup({
+			-- Only activate marksman when .marksman.toml exists to avoid indexing monorepos
+			vim.lsp.config("marksman", {
 				root_dir = function(fname)
-					-- Only activate if a .marksman.toml or .git exists in the tree
-					-- This prevents marksman from indexing giant monorepos
-					local root = lspconfig.util.root_pattern(".marksman.toml")(fname)
-					if root then
-						return root
-					end
-					-- Fall back to the file's own directory (single-file mode)
-					return lspconfig.util.path.dirname(fname)
+					return vim.fs.root(fname, { ".marksman.toml" }) or vim.fs.dirname(fname)
 				end,
+			})
+
+			vim.lsp.enable({
+				"gopls",
+				"rust_analyzer",
+				"csharp_ls",
+				"lua_ls",
+				"ts_ls",
+				"pyright",
+				"marksman",
 			})
 		end,
 	},
