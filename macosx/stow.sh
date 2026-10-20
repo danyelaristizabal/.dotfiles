@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Remove default shell files that macOS creates on a fresh install so stow can symlink them
+# Remove files/dirs that macOS or apps create on a fresh install so stow can symlink them
 rm -f "$HOME/.zshrc" "$HOME/.zprofile"
+rm -rf "$HOME/.config/ghostty"
 
 for dir in */ ; do
     dirname="${dir%/}"
