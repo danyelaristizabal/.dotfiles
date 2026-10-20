@@ -14,8 +14,7 @@ flowchart TD
     MAC --> BREW["install_homebrew\nHomebrew + PATH"]
     BREW --> PKGS["install_brew_packages\nformulae: neovim, tmux, go, fzf…"]
     PKGS --> CASKS["install_brew_casks\nGUI apps: ghostty, claude, docker…"]
-    CASKS --> MC["setup_mission_control\ndefaults write workspaces-auto-swoosh"]
-    MC --> FZF["setup_fzf\neval fzf --zsh → .zshrc"]
+    CASKS --> FZF["setup_fzf\neval fzf --zsh → .zshrc"]
     FZF --> NPM["setup_node_packages\nnpm install -g claude-code"]
     NPM --> TPM["clone_tmux_plugin_manager\n~/.tmux/plugins/tpm"]
     TPM --> STOW_MAC["stow_packages"]
@@ -114,13 +113,19 @@ The script will install Xcode Command Line Tools, clone this repo, and set every
 
 ## Post-install manual steps
 
+### Mission Control (required for Hammerspoon Space-switching)
+
+Enable "When switching to an application, switch to a Space with open windows" in System Settings → Desktop & Dock → Mission Control, or run:
+
+```bash
+defaults write com.apple.dock workspaces-auto-swoosh -bool YES && killall Dock
+```
+
 ### Hammerspoon
 
 1. **Grant Accessibility permission** — on first launch, macOS will prompt you; approve it in System Settings → Privacy & Security → Accessibility
 2. **Remove conflicting Raycast hotkeys** — any binding that collides (⌥C, ⌥V, ⌥S, ⌥B, ⌥↩, ⌥⇧C, ⌥/) will be swallowed by Raycast before Hammerspoon sees it
 3. **Press ⌥/** to show a cheatsheet of all configured bindings on screen
-
-The Mission Control "switch to a Space with open windows" setting is enabled automatically by the install script.
 
 ## Stow only
 

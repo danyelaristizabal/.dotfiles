@@ -218,11 +218,6 @@ stow_packages() {
     fi
 }
 
-setup_mission_control() {
-    echo "Enabling Mission Control switch-to-Space behavior..."
-    defaults write com.apple.dock workspaces-auto-swoosh -bool YES
-    killall Dock
-}
 
 setup_fzf() {
     if command_exists fzf; then
@@ -248,7 +243,6 @@ brew update
 install_brew_packages
 install_brew_casks
 
-setup_mission_control
 setup_fzf
 setup_node_packages
 
