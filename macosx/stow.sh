@@ -8,6 +8,6 @@ for dir in */ ; do
     dirname="${dir%/}"
     if [[ -d "$dirname" ]]; then
         echo "Stowing $dirname..."
-        stow -t "$HOME" "$dirname"
+        stow --no-folding -t "$HOME" "$dirname"
     fi
 done
