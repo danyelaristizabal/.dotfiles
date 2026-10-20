@@ -91,6 +91,9 @@ BREW_CASKS=(
     "google-chrome"
     "vivaldi"
 
+    # Fonts
+    "font-fira-code-nerd-font" # Fira Code with Nerd Font icons (required for nvim/oil icons)
+
     # Development
     "visual-studio-code"
     "ghostty" # terminal
