@@ -1,4 +1,4 @@
--- ~/.hammerspoon/init.lua  (stow package: .dotfiles/hammerspoon/.hammerspoon/init.lua)
+-- ~/.hammerspoon/init.lua  (stow package: .dotfiles/macosx/hammerspoon/.hammerspoon/init.lua)
 --
 -- Run-or-raise app hotkeys.
 -- Requires: System Settings → Desktop & Dock → Mission Control →

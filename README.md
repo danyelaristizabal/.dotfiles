@@ -43,8 +43,7 @@ flowchart TD
 ├── zshrc/         # Zsh configuration
 ├── zprofile/      # Zsh profile
 ├── wezterm/       # WezTerm configuration
-├── ghostty/       # Ghostty configuration
-├── hammerspoon/   # Hammerspoon keybindings (run-or-raise)
+├── ghostty/       # Ghostty configuration (macOS + Linux)
 └── stow.sh        # Stow all packages at once
 ```
 
