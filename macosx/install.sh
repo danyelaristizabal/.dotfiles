@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+export NONINTERACTIVE=1
 
 # macOS Installation Script
 # Installs Homebrew, formulae, casks, and sets up dotfiles
@@ -30,7 +31,7 @@ cd "$HOME/.dotfiles"
 # --- CONFIGURATION ---
 DOTFILES_DIR="$HOME/.dotfiles"
 STOW_TARGET="$HOME"
-STOW_PACKAGES=(tmux gitconfig nvim wezterm zprofile zshrc)
+STOW_PACKAGES=(tmux gitconfig nvim wezterm zprofile zshrc hammerspoon)
 
 # Top-level formulae (deps are pulled in automatically)
 BREW_PACKAGES=(
@@ -111,8 +112,9 @@ BREW_CASKS=(
     "zoom"
 
     # Productivity
-    "raycast"   # spotlight replacement
-    "bitwarden" # password manager
+    "raycast"      # spotlight replacement
+    "bitwarden"    # password manager
+    "hammerspoon"  # app-launcher keybindings; config at ~/.hammerspoon/init.lua
 
     # Media
     "spotify"
@@ -195,6 +197,12 @@ stow_packages() {
     fi
 }
 
+setup_mission_control() {
+    echo "Enabling Mission Control switch-to-Space behavior..."
+    defaults write com.apple.dock workspaces-auto-swoosh -bool YES
+    killall Dock
+}
+
 setup_fzf() {
     if command_exists fzf; then
         if ! grep -q "fzf --zsh" "$HOME/.zshrc" 2>/dev/null; then
@@ -219,6 +227,7 @@ brew update && brew upgrade
 install_brew_packages
 install_brew_casks
 
+setup_mission_control
 setup_fzf
 setup_node_packages
 
