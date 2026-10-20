@@ -139,6 +139,10 @@ command_exists() {
 }
 
 install_homebrew() {
+    # Load brew into PATH if already installed but not in current shell PATH
+    [[ -f "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+    [[ -f "/usr/local/bin/brew" ]] && eval "$(/usr/local/bin/brew shellenv)"
+
     if ! command_exists brew; then
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
