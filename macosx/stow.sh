@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Stow all directories in the current directory except "arch", "macosx", and "stow.sh" itself
+# Remove default shell files that macOS creates on a fresh install so stow can symlink them
+rm -f "$HOME/.zshrc" "$HOME/.zprofile"
 
 for dir in */ ; do
     dirname="${dir%/}"
