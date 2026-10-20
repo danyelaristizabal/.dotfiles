@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ -f "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Remove files/dirs that macOS or apps create on a fresh install so stow can symlink them
 rm -f "$HOME/.zshrc" "$HOME/.zprofile"
 

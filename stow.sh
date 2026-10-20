@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ -f "/opt/homebrew/bin/brew" ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # Stow all directories in the current directory except "arch", "macosx", and "stow.sh" itself
 
 # Remove dirs that apps create on a fresh install so stow can symlink them
