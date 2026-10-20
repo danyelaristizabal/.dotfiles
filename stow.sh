@@ -10,6 +10,6 @@ for dir in */; do
   fi
   if [[ -d "$dirname" ]]; then
     echo "Stowing $dirname..."
-    stow "$dirname"
+    stow --no-folding "$dirname"
   fi
 done
