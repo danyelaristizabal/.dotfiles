@@ -108,7 +108,6 @@ BREW_CASKS=(
     "slack"
     "telegram"
     "whatsapp"
-    "zoom"
 
     # Productivity
     "raycast"      # spotlight replacement
@@ -193,7 +192,7 @@ stow_packages() {
         echo "Stowing dotfiles..."
         for package in "${STOW_PACKAGES[@]}"; do
             echo "Stowing $package..."
-            stow -d "$DOTFILES_DIR" -t "$STOW_TARGET" -v "$package"
+            (cd "$DOTFILES_DIR" && stow -t "$STOW_TARGET" -v "$package")
         done
     else
         echo "stow not found — install it first"
