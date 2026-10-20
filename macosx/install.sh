@@ -92,7 +92,7 @@ BREW_CASKS=(
     "vivaldi"
 
     # Fonts
-    "font-fira-code-nerd-font" # Fira Code with Nerd Font icons (required for nvim/oil icons)
+    "font-jetbrains-mono-nerd-font" # JetBrains Mono with Nerd Font icons (required for nvim/oil icons)
 
     # Development
     "visual-studio-code"
@@ -264,4 +264,8 @@ clone_tmux_plugin_manager
 stow_packages
 
 echo "Installation complete!"
-echo "Run 'source ~/.zshrc' to apply shell changes."
+echo ""
+echo "Next steps:"
+echo "  1. Restart Ghostty fully (Cmd+Q) so it picks up FiraCode Nerd Font"
+echo "  2. source ~/.zshrc"
+echo "  3. Inside tmux: press Ctrl+a I to install plugins, then Ctrl+a r to reload"
