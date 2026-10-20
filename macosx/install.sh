@@ -15,7 +15,7 @@ if ! xcode-select -p &>/dev/null; then
         | grep -E '\* Label: Command Line Tools' \
         | sed 's/^.*Label: //' \
         | sort -V | tail -n1)
-    softwareupdate -i "$CLT" --verbose
+    sudo softwareupdate -i "$CLT" --verbose
     rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 else
     echo "Xcode Command Line Tools already installed"
@@ -162,16 +162,24 @@ install_brew_packages() {
     echo "Installing brew formulae..."
     brew update
     for package in "${BREW_PACKAGES[@]}"; do
-        echo "Installing $package..."
-        brew install "$package" || echo "Failed to install $package"
+        if brew list --formula "$package" &>/dev/null; then
+            echo "$package already installed, skipping"
+        else
+            echo "Installing $package..."
+            brew install "$package" || echo "Failed to install $package"
+        fi
     done
 }
 
 install_brew_casks() {
     echo "Installing brew casks..."
     for cask in "${BREW_CASKS[@]}"; do
-        echo "Installing $cask..."
-        brew install --cask "$cask" || echo "Failed to install $cask"
+        if brew list --cask "$cask" &>/dev/null; then
+            echo "$cask already installed, skipping"
+        else
+            echo "Installing $cask..."
+            brew install --cask "$cask" || echo "Failed to install $cask"
+        fi
     done
 }
 
