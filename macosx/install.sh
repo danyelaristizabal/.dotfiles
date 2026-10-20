@@ -259,9 +259,9 @@ setup_fzf
 setup_node_packages
 
 setup_zsh_framework
-clone_tmux_plugin_manager
-
 stow_packages
+
+clone_tmux_plugin_manager
 
 echo "Installation complete!"
 echo ""
