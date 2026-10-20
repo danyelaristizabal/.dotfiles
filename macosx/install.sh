@@ -216,6 +216,8 @@ clone_tmux_plugin_manager() {
     else
         echo "tmux plugin manager already exists"
     fi
+    echo "Installing tmux plugins..."
+    "$TMUX_PLUGIN_PATH/bin/install_plugins"
 }
 
 stow_packages() {
