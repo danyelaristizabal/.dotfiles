@@ -15,7 +15,6 @@ local bindings = {
 	{ mods = { "alt" }, key = "s", app = "Slack" },
 	{ mods = { "alt", "shift" }, key = "c", app = "Claude" },
 	{ mods = { "alt" }, key = "b", app = "Bitwarden" },
-	{ mods = { "alt" }, key = "d", app = "Safari" },
 }
 
 -- Hotkey that shows all bindings on screen
@@ -85,8 +84,43 @@ for _, b in ipairs(bindings) do
 	table.insert(lines, string.format("%s%s  →  %s", prettyMods(b.mods), b.key:upper(), b.app))
 end
 
+---------------------------------------------------------------------------
+-- Window management
+---------------------------------------------------------------------------
+local function moveWindow(action)
+	local win = hs.window.focusedWindow()
+	if not win then return end
+	local screen = win:screen():frame()
+
+	local frames = {
+		maximize = { x = screen.x, y = screen.y, w = screen.w, h = screen.h },
+		left     = { x = screen.x, y = screen.y, w = screen.w / 2, h = screen.h },
+		right    = { x = screen.x + screen.w / 2, y = screen.y, w = screen.w / 2, h = screen.h },
+	}
+
+	win:setFrame(frames[action])
+end
+
+local windowBindings = {
+	{ mods = { "alt" }, key = "m", action = "maximize", label = "Maximize" },
+	{ mods = { "alt" }, key = "h", action = "left",     label = "Left half" },
+	{ mods = { "alt" }, key = "l", action = "right",    label = "Right half" },
+}
+
+local windowLines = {}
+for _, b in ipairs(windowBindings) do
+	hs.hotkey.bind(b.mods, b.key, function()
+		moveWindow(b.action)
+	end)
+	table.insert(windowLines, string.format("%s%s  →  %s", prettyMods(b.mods), b.key:upper(), b.label))
+end
+
 hs.hotkey.bind(cheatsheetHotkey.mods, cheatsheetHotkey.key, function()
-	hs.alert.show(table.concat(lines, "\n"), 3)
+	local all = {}
+	for _, l in ipairs(lines) do table.insert(all, l) end
+	table.insert(all, "")
+	for _, l in ipairs(windowLines) do table.insert(all, l) end
+	hs.alert.show(table.concat(all, "\n"), 3)
 end)
 
 ---------------------------------------------------------------------------
