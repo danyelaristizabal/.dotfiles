@@ -11,10 +11,10 @@ export NONINTERACTIVE=1
 if ! xcode-select -p &>/dev/null; then
     echo "Installing Xcode Command Line Tools..."
     touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
-    CLT=$(softwareupdate -l 2>/dev/null \
-        | grep -E '\* Label: Command Line Tools' \
-        | sed 's/^.*Label: //' \
-        | sort -V | tail -n1)
+    CLT=$(softwareupdate -l 2>/dev/null |
+        grep -E '\* Label: Command Line Tools' |
+        sed 's/^.*Label: //' |
+        sort -V | tail -n1)
     sudo softwareupdate -i "$CLT" --verbose
     rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
 else
@@ -111,9 +111,8 @@ BREW_CASKS=(
     "whatsapp"
 
     # Productivity
-    "raycast"      # spotlight replacement
-    "bitwarden"    # password manager
-    "hammerspoon"  # app-launcher keybindings; config at ~/.hammerspoon/init.lua
+    "bitwarden"   # password manager
+    "hammerspoon" # app-launcher keybindings; config at ~/.hammerspoon/init.lua
 
     # Media
     "spotify"
@@ -126,7 +125,6 @@ BREW_CASKS=(
     # Other
     "anki" # flashcards
     "tradingview"
-
 
 )
 
@@ -229,7 +227,6 @@ stow_packages() {
         echo "stow not found — install it first"
     fi
 }
-
 
 setup_fzf() {
     if command_exists fzf; then
