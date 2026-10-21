@@ -91,7 +91,7 @@ return {
 				"rust_analyzer",
 				"csharp_ls",
 				"lua_ls",
-				"ts_ls",
+				"vtsls",
 				"pyright",
 				"marksman",
 			})
@@ -155,8 +155,6 @@ return {
 	-- treesiter
 	{
 		"nvim-treesitter/nvim-treesitter",
-		-- `main` is a rewrite: no more `nvim-treesitter.configs`, highlighting is started
-		-- per buffer with vim.treesitter.start(), and parsers need the `tree-sitter` CLI.
 		branch = "main",
 		build = ":TSUpdate",
 		lazy = false,
@@ -353,68 +351,6 @@ return {
 			})
 		end,
 	},
-	-- linting
-	{
-		"mfussenegger/nvim-lint",
-		event = { "BufReadPre", "BufNewFile" },
-		config = function()
-			local lint = require("lint")
-			lint.linters_by_ft = {
-				go = { "golangcilint" },
-				javascript = { "eslint_d" },
-				typescript = { "eslint_d" },
-				sh = { "shellcheck" },
-				bash = { "shellcheck" },
-				zsh = { "shellcheck" },
-				python = { "pylint" },
-				markdown = { "markdownlint_cli2" },
-			}
-
-			-- Helper function to find the Go module root (directory containing go.mod)
-			local function find_go_module_root(start_path)
-				local current_dir = start_path
-				while current_dir ~= "/" and current_dir ~= "." do
-					local go_mod_path = current_dir .. "/go.mod"
-					if vim.fn.filereadable(go_mod_path) == 1 then
-						return current_dir
-					end
-					current_dir = vim.fn.fnamemodify(current_dir, ":h")
-				end
-				return nil
-			end
-
-			-- markdownlint-cli2 needs stdin input via --stdin flag
-			lint.linters.markdownlint_cli2 = {
-				name = "markdownlint-cli2",
-				cmd = "markdownlint-cli2",
-				stdin = true,
-				args = { "--stdin" },
-				stream = "stderr",
-				ignore_exitcode = true,
-				parser = require("lint.parser").from_pattern(
-					"stdin:%d+:%d* (.+)",
-					{ "message" },
-					nil,
-					{ ["source"] = "markdownlint" }
-				),
-			}
-
-			-- Customize golangcilint to run from the module root so it picks up .golangci.yml
-			lint.linters.golangcilint.cwd = function()
-				local current_file = vim.api.nvim_buf_get_name(0)
-				local current_dir = vim.fn.fnamemodify(current_file, ":h")
-				local module_root = find_go_module_root(current_dir)
-				return module_root or current_dir
-			end
-
-			-- Auto-lint on save and when entering buffer
-			vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
-				callback = function()
-					lint.try_lint()
-				end,
-			})
-		end,
-	},
 	-- case conversion
 	{
 		"tpope/vim-abolish",
@@ -473,19 +409,10 @@ return {
 			"nvim-lua/plenary.nvim",
 		},
 	},
-	-- Format style when saving
-	{
-		"stevearc/conform.nvim",
-		branch = "nvim-0.9",
-		opts = {},
-	},
 	-- games
 	{ "theprimeagen/vim-be-good" },
 	-- File manager
 	{ "stevearc/oil.nvim" },
-	{
-		"mason-org/mason.nvim",
-	},
 	-- run tests
 	{
 		"vim-test/vim-test",

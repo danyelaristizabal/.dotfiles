@@ -1,10 +1,13 @@
 -- Go first IDE setup + common languages
 return {
 	-- 1) Making sure dev tools are installed
+	{ "mason-org/mason.nvim", opts = {} },
 	{
-		"mason-org/mason.nvim",
-		opts = function(_, opts)
-			opts.ensure_installed = vim.tbl_extend("force", opts.ensure_installed or {}, {
+		-- mason.nvim itself has no `ensure_installed`; this plugin provides it
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = { "mason-org/mason.nvim" },
+		opts = {
+			ensure_installed = {
 				-- GitUI
 				"gitui",
 				-- Go
@@ -12,8 +15,8 @@ return {
 				"gofumpt",
 				"goimports",
 				"golangci-lint",
-				-- TS/JS
 				"delve",
+				-- TS/JS
 				"vtsls",
 				"prettierd",
 				"eslint_d",
@@ -28,8 +31,8 @@ return {
 				"marksman",
 				"markdownlint-cli2",
 				"markdown-toc",
-			})
-		end,
+			},
+		},
 	},
 	-- code outline :aerialopen
 	{
@@ -44,20 +47,48 @@ return {
 	-- 3) Formatting
 	{
 		"stevearc/conform.nvim",
+		event = "BufWritePre",
+		cmd = "ConformInfo",
 		opts = {
 			formatters_by_ft = {
 				go = { "gofumpt", "goimports" },
 				lua = { "stylua" },
-				javascript = { "prettierd", "prettier" },
-				typescript = { "prettierd", "prettier" },
-				json = { "prettierd", "prettier" },
-				yaml = { "prettierd", "prettier" },
-				html = { "prettierd", "prettier" },
+				python = { "isort", "black" },
+				javascript = { "prettierd", "prettier", stop_after_first = true },
+				typescript = { "prettierd", "prettier", stop_after_first = true },
+				json = { "prettierd", "prettier", stop_after_first = true },
+				yaml = { "prettierd", "prettier", stop_after_first = true },
+				html = { "prettierd", "prettier", stop_after_first = true },
 				tmpl = { "templ", "prettierd", "prettier" },
-				css = { "prettierd", "prettier" },
+				css = { "prettierd", "prettier", stop_after_first = true },
 				sh = { "shfmt" },
 				bash = { "shfmt" },
 				zsh = { "shfmt" },
+				markdown = { "prettierd", "markdownlint-cli2", "markdown-toc" },
+				["markdown.mdx"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
+			},
+			formatters = {
+				["markdown-toc"] = {
+					condition = function(_, ctx)
+						for _, line in ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)) do
+							if line:find("<!%-%- toc %-%->") then
+								return true
+							end
+						end
+					end,
+				},
+				["markdownlint-cli2"] = {
+					condition = function(_, ctx)
+						local diag = vim.tbl_filter(function(d)
+							return d.source == "markdownlint"
+						end, vim.diagnostic.get(ctx.buf))
+						return #diag > 0
+					end,
+				},
+			},
+			format_on_save = {
+				timeout_ms = 3000,
+				lsp_format = "fallback",
 			},
 		},
 	},
@@ -65,16 +96,50 @@ return {
 	-- 4) Linting
 	{
 		"mfussenegger/nvim-lint",
-		opts = {
-			linters_by_ft = {
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			local lint = require("lint")
+			lint.linters_by_ft = {
 				go = { "golangcilint" },
 				javascript = { "eslint_d" },
 				typescript = { "eslint_d" },
 				sh = { "shellcheck" },
 				bash = { "shellcheck" },
 				zsh = { "shellcheck" },
-			},
-		},
+				python = { "pylint" },
+				markdown = { "markdownlint_cli2" },
+			}
+
+			-- markdownlint-cli2 needs stdin input via --stdin flag
+			lint.linters.markdownlint_cli2 = {
+				name = "markdownlint-cli2",
+				cmd = "markdownlint-cli2",
+				stdin = true,
+				args = { "--stdin" },
+				stream = "stderr",
+				ignore_exitcode = true,
+				parser = require("lint.parser").from_pattern(
+					"stdin:%d+:%d* (.+)",
+					{ "message" },
+					nil,
+					{ ["source"] = "markdownlint" }
+				),
+			}
+
+			-- Auto-lint on save and when entering buffer
+			vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
+				group = vim.api.nvim_create_augroup("nvim_lint", { clear = true }),
+				callback = function(args)
+					local opts = {}
+					-- Run golangci-lint from the module root so it picks up .golangci.yml.
+					-- nvim-lint only accepts a string cwd, so it is resolved here per buffer.
+					if vim.bo[args.buf].filetype == "go" then
+						opts.cwd = vim.fs.root(args.buf, "go.mod") or vim.fs.dirname(vim.api.nvim_buf_get_name(args.buf))
+					end
+					lint.try_lint(nil, opts)
+				end,
+			})
+		end,
 	},
 	-- 5) Debugging for Go
 	{ "mfussenegger/nvim-dap" },
