@@ -155,25 +155,42 @@ return {
 	-- treesiter
 	{
 		"nvim-treesitter/nvim-treesitter",
+		-- `main` is a rewrite: no more `nvim-treesitter.configs`, highlighting is started
+		-- per buffer with vim.treesitter.start(), and parsers need the `tree-sitter` CLI.
+		branch = "main",
 		build = ":TSUpdate",
 		lazy = false,
 		config = function()
-			local ok, configs = pcall(require, "nvim-treesitter.configs")
-			if not ok then return end
-			configs.setup({
-				ensure_installed = { "go", "lua", "c_sharp", "javascript", "graphql", "markdown", "markdown_inline" },
-				auto_install = true,
-				highlight = {
-					enable = true,
-					disable = function(lang, buf)
-						local max_filesize = 100 * 1024
-						local ok2, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-						if ok2 and stats and stats.size > max_filesize then
-							return true
-						end
-					end,
-					additional_vim_regex_highlighting = false,
-				},
+			local ts = require("nvim-treesitter")
+			ts.install({ "go", "gomod", "gosum", "lua", "c_sharp", "javascript", "graphql", "markdown", "markdown_inline" })
+
+			local max_filesize = 100 * 1024
+			local function start(buf, lang)
+				local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+				if ok and stats and stats.size > max_filesize then
+					return
+				end
+				pcall(vim.treesitter.start, buf, lang)
+			end
+
+			vim.api.nvim_create_autocmd("FileType", {
+				group = vim.api.nvim_create_augroup("treesitter_start", { clear = true }),
+				callback = function(args)
+					local lang = vim.treesitter.language.get_lang(args.match)
+					if not lang then
+						return
+					end
+					if vim.tbl_contains(ts.get_installed(), lang) then
+						start(args.buf, lang)
+					elseif vim.tbl_contains(ts.get_available(), lang) then
+						-- replaces the old `auto_install = true`
+						ts.install(lang):await(function()
+							if vim.api.nvim_buf_is_valid(args.buf) then
+								start(args.buf, lang)
+							end
+						end)
+					end
+				end,
 			})
 		end,
 	},
