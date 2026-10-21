@@ -81,8 +81,9 @@ return {
 
 			-- Only activate marksman when .marksman.toml exists to avoid indexing monorepos
 			vim.lsp.config("marksman", {
-				root_dir = function(fname)
-					return vim.fs.root(fname, { ".marksman.toml" }) or vim.fs.dirname(fname)
+				root_dir = function(bufnr, on_dir)
+					local fname = vim.api.nvim_buf_get_name(bufnr)
+					on_dir(vim.fs.root(bufnr, { ".marksman.toml" }) or vim.fs.dirname(fname))
 				end,
 			})
 
