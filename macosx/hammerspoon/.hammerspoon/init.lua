@@ -13,6 +13,7 @@ local bindings = {
 	{ mods = { "alt" }, key = "c", app = "Google Chrome" },
 	{ mods = { "alt" }, key = "v", app = "Vivaldi" },
 	{ mods = { "alt" }, key = "s", app = "Slack" },
+	{ mods = { "alt", "shift" }, key = "s", app = "Spotify" },
 	{ mods = { "alt", "shift" }, key = "c", app = "Claude" },
 	{ mods = { "alt" }, key = "b", app = "Bitwarden" },
 }
