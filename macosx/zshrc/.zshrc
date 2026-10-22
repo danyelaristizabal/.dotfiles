@@ -4,7 +4,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -114,7 +114,6 @@ source $ZSH/oh-my-zsh.sh
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
-
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -133,27 +132,16 @@ export GEMINI_API_KEY=${GEMINI_API_KEY:-$(pass show gemini 2>/dev/null)}
 export OPENAI_API_KEY=${OPENAI_API_KEY:-$(pass show openai 2>/dev/null)}
 export NPM_GITHUB_TOKEN=${NPM_GITHUB_TOKEN:-$(pass show github/npm-token 2>/dev/null)}
 
-# MODAK 
-export ATLASSIAN=${ATLASSIAN:-$(pass show atlassian 2>/dev/null)}
-export AUTHS_KEY=${AUTHS_KEY:-$(pass show authskey 2>/dev/null)}
-export WEBHOOK_KEY=${WEBHOOK_KEY:-$(pass show webhookkey 2>/dev/null)}
-export WEBHOOK_KEY_DEV=${WEBHOOK_KEY_DEV:-$(pass show webhookkeydev 2>/dev/null)}
-export TWISP=$(pass show twisp)
-export BACKOFFICE=$(pass show backoffice)
-
-
-
-export ATLASSIAN=${ATLASSIAN:-$(pass show atlassian 2>/dev/null)}
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=grpc
 alias vim='nvim'
 alias mockery2="$HOME/.tools/bin/mockery-v2"
 alias mockery3="/opt/homebrew/bin/mockery"
 export capath="$HOME/projects/cacharreo"
 
-#how to set up pass https://medium.com/@hitechluddite/ditch-cleartext-secrets-how-to-safeguard-api-keys-in-zsh-and-bash-with-pass-77f694b9ff64 
+#how to set up pass https://medium.com/@hitechluddite/ditch-cleartext-secrets-how-to-safeguard-api-keys-in-zsh-and-bash-with-pass-77f694b9ff64
 
 eval "$(tmuxifier init -)"
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
