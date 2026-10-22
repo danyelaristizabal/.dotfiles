@@ -64,7 +64,6 @@ vim.api.nvim_create_autocmd("User", {
 			{ "<leader>g", group = "Git/Generate" },
 			{ "<leader>v", group = "VimWithMe" },
 			{ "<leader>s", group = "Search/Substitute" },
-			{ "<leader>c", group = "Markdown/Preview" },
 			{ "<leader>m", group = "Markdown" },
 			{ "<leader>a", group = "AI/Harpoon" },
 			{ "<leader>t", group = "Terminal/Tests" },

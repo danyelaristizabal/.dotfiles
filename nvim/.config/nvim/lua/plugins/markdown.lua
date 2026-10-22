@@ -30,21 +30,26 @@ return {
 		},
 	},
 	{
-		"iamcco/markdown-preview.nvim",
-		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-		build = function()
-			require("lazy").load({ plugins = { "markdown-preview.nvim" } })
-			vim.fn["mkdp#util#install"]()
-		end,
-		config = function()
-			vim.cmd([[do FileType]])
-		end,
+		"brianhuster/live-preview.nvim",
+		cmd = "LivePreview",
 		keys = {
 			{
-				"<leader>cp",
-				"<cmd>MarkdownPreviewToggle<cr>",
-				ft = "markdown",
-				desc = "Markdown Preview",
+				"<leader>lp",
+				function()
+					-- Each nvim instance runs its own server, so skip ports taken by other instances
+					local lp = require("livepreview")
+					if not lp.is_running() then
+						local utils = require("livepreview.utils")
+						local port = 5500
+						while #utils.processes_listening_on_port(port) > 0 do
+							port = port + 1
+						end
+						require("livepreview.config").set({ port = port })
+					end
+					vim.cmd("LivePreview start")
+				end,
+				ft = { "markdown", "html", "asciidoc", "svg" },
+				desc = "Live Preview",
 			},
 		},
 	},
