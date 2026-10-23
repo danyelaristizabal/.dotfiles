@@ -131,6 +131,7 @@ export GROQ_API_KEY=${GROQ_API_KEY:-$(pass show groq 2>/dev/null)}
 export GEMINI_API_KEY=${GEMINI_API_KEY:-$(pass show gemini 2>/dev/null)}
 export OPENAI_API_KEY=${OPENAI_API_KEY:-$(pass show openai 2>/dev/null)}
 export NPM_GITHUB_TOKEN=${NPM_GITHUB_TOKEN:-$(pass show github/npm-token 2>/dev/null)}
+export GITHUB_COBRE_TOKEN=${GITHUB_COBRE_TOKEN:-$(pass show git/danyel.aristizabal@cobre.co 2>/dev/null | head -n1)}
 
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=grpc
 alias vim='nvim'
