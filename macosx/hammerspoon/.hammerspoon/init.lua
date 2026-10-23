@@ -16,6 +16,7 @@ local bindings = {
 	{ mods = { "alt", "shift" }, key = "s", app = "Spotify" },
 	{ mods = { "alt", "shift" }, key = "c", app = "Claude" },
 	{ mods = { "alt" }, key = "b", app = "Bitwarden" },
+	{ mods = { "alt" }, key = "t", app = "Sublime Text" },
 }
 
 -- Hotkey that shows all bindings on screen
