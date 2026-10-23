@@ -125,6 +125,7 @@ export PATH="$HOME/.luaver/lua/5.1/bin:$PATH"
 export EDITOR=nvim
 export PATH="$HOME/.tmuxifier/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
 
 export ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-$(pass show anthropic 2>/dev/null)}
 export GROQ_API_KEY=${GROQ_API_KEY:-$(pass show groq 2>/dev/null)}

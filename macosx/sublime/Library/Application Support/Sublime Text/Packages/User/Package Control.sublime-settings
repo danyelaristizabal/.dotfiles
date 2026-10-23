@@ -1,0 +1,10 @@
+{
+	// Package Control installs anything listed here that's missing on startup
+	"installed_packages": [
+		"NeoVintageous",
+		"Package Control",
+	],
+	"in_process_packages":
+	[
+	],
+}

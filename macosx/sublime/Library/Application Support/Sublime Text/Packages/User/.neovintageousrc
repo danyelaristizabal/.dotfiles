@@ -1,0 +1,14 @@
+" Mirrors the core mappings from nvim/.config/nvim/lua/config/remap.lua
+let mapleader=<space>
+
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" yank to system clipboard
+nnoremap <leader>y "+y
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+Y
+
+inoremap <C-c> <Esc>

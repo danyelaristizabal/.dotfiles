@@ -236,6 +236,36 @@ setup_fzf() {
     fi
 }
 
+setup_sublime() {
+    # Package Control reads Packages/User/Package Control.sublime-settings (stowed)
+    # on first launch and installs every listed package, NeoVintageous included
+    local installed="$HOME/Library/Application Support/Sublime Text/Installed Packages"
+    if [ ! -f "$installed/Package Control.sublime-package" ]; then
+        echo "Installing Sublime Package Control..."
+        mkdir -p "$installed"
+        curl -fsSL -o "$installed/Package Control.sublime-package" \
+            "https://download.sublimetext.com/Package%20Control.sublime-package"
+    else
+        echo "Sublime Package Control already installed"
+    fi
+
+    # Netskope re-signs HTTPS with its own CA; Package Control ships its own CA list
+    # and rejects it, so hand it the Netskope certs from the system keychain
+    local keychain="/Library/Keychains/System.keychain"
+    if security find-certificate -c "goskope.com" "$keychain" &>/dev/null; then
+        echo "Adding Netskope CA to Sublime Package Control..."
+        local user_dir="$HOME/Library/Application Support/Sublime Text/Packages/User"
+        mkdir -p "$user_dir"
+        {
+            security find-certificate -a -c "certadmin" -p "$keychain"
+            security find-certificate -a -c "goskope.com" -p "$keychain"
+        } >"$user_dir/Package Control.user-ca-bundle"
+    fi
+
+    # Holding hjkl repeats instead of showing the accent picker (needed for vim mode)
+    defaults write com.sublimetext.4 ApplePressAndHoldEnabled -bool false
+}
+
 setup_node_packages() {
     echo "Installing global Node.js packages..."
     npm install -g @anthropic-ai/claude-code
@@ -257,6 +287,7 @@ setup_node_packages
 
 setup_zsh_framework
 stow_packages
+setup_sublime
 
 clone_tmux_plugin_manager
 

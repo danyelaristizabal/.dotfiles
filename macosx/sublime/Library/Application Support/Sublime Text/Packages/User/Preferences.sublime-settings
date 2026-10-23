@@ -1,0 +1,10 @@
+{
+	// Vintage is Sublime's built-in vim mode; NeoVintageous replaces it
+	"ignored_packages": ["Vintage",
+	],
+
+	// Let NeoVintageous handle ctrl keys (<C-d>, <C-u>, <C-v>, ...)
+	"vintageous_use_ctrl_keys": true,
+	"index_files": true,
+	"neovintageous_build_version": 13200,
+}
