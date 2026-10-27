@@ -58,6 +58,45 @@ local claude = Terminal:new({ cmd = "claude", count = 100, direction = "float", 
 
 local lazygit = Terminal:new({ cmd = "lazygit", count = 102, direction = "float", hidden = true })
 
+-- Browser view of the current API spec, picked by its first key:
+--   openapi:  Redocly builds a static HTML page and opens it
+--   asyncapi: bundled into one file first (the browser can't resolve local $refs), then Studio
+-- Both show a snapshot. From a spec buffer: rebuild. From the viewer terminal: hide it.
+local studio
+
+vim.keymap.set({ "n", "t" }, "<leader>ta", function()
+	if studio and vim.bo.buftype == "terminal" then
+		studio:toggle()
+		return
+	end
+	if studio then
+		studio:shutdown()
+	end
+	local file = vim.api.nvim_buf_get_name(0)
+	local src = vim.fn.shellescape(file)
+	local cmd
+	if vim.fn.search("^openapi:", "nw") > 0 then
+		local html = vim.fn.shellescape(vim.fn.tempname() .. ".html")
+		cmd = string.format("npx -y @redocly/cli build-docs %s -o %s && open %s", src, html, html)
+	else
+		local bundled = vim.fn.shellescape(vim.fn.tempname() .. ".yaml")
+		cmd = string.format(
+			"npx -y @asyncapi/cli bundle %s -o %s && npx -y @asyncapi/cli start studio -f %s",
+			src,
+			bundled,
+			bundled
+		)
+	end
+	studio = Terminal:new({
+		cmd = cmd,
+		dir = vim.fn.fnamemodify(file, ":h"),
+		count = 103,
+		direction = "float",
+		hidden = true,
+	})
+	studio:toggle()
+end, { desc = "API spec viewer" })
+
 vim.keymap.set({ "n", "t" }, "<leader>tc", function()
 	claude:toggle()
 end, { desc = "claude" })
