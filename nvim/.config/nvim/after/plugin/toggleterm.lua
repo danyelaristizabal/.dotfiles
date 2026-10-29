@@ -61,14 +61,10 @@ local lazygit = Terminal:new({ cmd = "lazygit", count = 102, direction = "float"
 -- Browser view of the current API spec, picked by its first key:
 --   openapi:  Redocly builds a static HTML page and opens it
 --   asyncapi: bundled into one file first (the browser can't resolve local $refs), then Studio
--- Both show a snapshot. From a spec buffer: rebuild. From the viewer terminal: hide it.
+-- Both show a snapshot: run it again to rebuild. Only mapped in yaml buffers.
 local studio
 
-vim.keymap.set({ "n", "t" }, "<leader>ta", function()
-	if studio and vim.bo.buftype == "terminal" then
-		studio:toggle()
-		return
-	end
+local function open_spec_viewer()
 	if studio then
 		studio:shutdown()
 	end
@@ -95,7 +91,14 @@ vim.keymap.set({ "n", "t" }, "<leader>ta", function()
 		hidden = true,
 	})
 	studio:toggle()
-end, { desc = "API spec viewer" })
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "yaml",
+	callback = function(args)
+		vim.keymap.set("n", "<leader>ta", open_spec_viewer, { buffer = args.buf, desc = "API spec viewer" })
+	end,
+})
 
 vim.keymap.set({ "n", "t" }, "<leader>tc", function()
 	claude:toggle()
