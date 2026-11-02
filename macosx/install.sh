@@ -266,6 +266,81 @@ setup_sublime() {
     defaults write com.sublimetext.4 ApplePressAndHoldEnabled -bool false
 }
 
+install_launch_agent() {
+    # Copies a LaunchAgent plist into ~/Library/LaunchAgents and (re)loads it
+    # only when it is new or changed. Label = plist file name without .plist
+    local src_plist="$1"
+    local label
+    label=$(basename "$src_plist" .plist)
+    local dst_plist="$HOME/Library/LaunchAgents/$label.plist"
+    local domain="gui/$(id -u)"
+    mkdir -p "$HOME/Library/LaunchAgents"
+    if ! cmp -s "$src_plist" "$dst_plist"; then
+        cp "$src_plist" "$dst_plist"
+        launchctl bootout "$domain/$label" &>/dev/null || true
+    fi
+    if ! launchctl print "$domain/$label" &>/dev/null; then
+        echo "Loading LaunchAgent $label..."
+        launchctl bootstrap "$domain" "$dst_plist"
+    else
+        echo "LaunchAgent $label already loaded"
+    fi
+}
+
+setup_always_on() {
+    # Keeps the Mac awake and reachable for remote sessions while on the charger.
+    # Config lives in macosx/system/always-on/ (see the comments in each file).
+    local src="$DOTFILES_DIR/macosx/system/always-on"
+
+    # 1. Charger power profile from pmset-charger.conf (only changed keys are set)
+    echo "Applying charger power settings..."
+    local ac_settings key value current
+    ac_settings=$(pmset -g custom | awk '/^AC Power:/ {f=1; next} /^[A-Za-z].*:$/ {f=0} f')
+    while read -r key value _; do
+        [[ -z "$key" || "$key" == \#* ]] && continue
+        current=$(awk -v k="$key" '$1 == k {print $2}' <<<"$ac_settings")
+        if [[ "$current" == "$value" ]]; then
+            echo "pmset $key already $value"
+        else
+            echo "pmset -c $key $value (was ${current:-unset})"
+            sudo pmset -c "$key" "$value" || echo "pmset $key not supported on this Mac, skipping"
+        fi
+    done <"$src/pmset-charger.conf"
+
+    # 2. Root LaunchDaemon that disables sleep (lid closed too) only while on the charger.
+    #    Copied, not stowed: launchd needs root-owned files for daemons.
+    local helper="/usr/local/libexec/dotfiles-always-on"
+    local daemon_label="com.danyelaristizabal.dotfiles.always-on"
+    local daemon_plist="/Library/LaunchDaemons/$daemon_label.plist"
+    local daemon_changed=0
+    sudo install -d -o root -g wheel -m 755 /usr/local/libexec
+    if ! sudo cmp -s "$src/dotfiles-always-on.sh" "$helper"; then
+        sudo install -o root -g wheel -m 755 "$src/dotfiles-always-on.sh" "$helper"
+        daemon_changed=1
+    fi
+    if ! sudo cmp -s "$src/$daemon_label.plist" "$daemon_plist"; then
+        sudo install -o root -g wheel -m 644 "$src/$daemon_label.plist" "$daemon_plist"
+        daemon_changed=1
+    fi
+    if [[ $daemon_changed -eq 1 ]] || ! sudo launchctl print "system/$daemon_label" &>/dev/null; then
+        echo "Loading always-on LaunchDaemon..."
+        sudo launchctl bootout "system/$daemon_label" &>/dev/null || true
+        sudo launchctl bootstrap system "$daemon_plist"
+    else
+        echo "always-on LaunchDaemon already loaded"
+    fi
+
+    # 3. Open the Claude app at login so remote sessions can reach this Mac
+    install_launch_agent "$src/com.danyelaristizabal.dotfiles.claude-at-login.plist"
+}
+
+setup_process_snapshot() {
+    # Writes ~/.dotfiles/.snapshots/processes.txt every minute (top processes by
+    # memory/CPU, memory pressure, swap) so the Mac can be checked remotely while
+    # the screen is off or locked. See macosx/system/process-snapshot/.
+    install_launch_agent "$DOTFILES_DIR/macosx/system/process-snapshot/com.danyelaristizabal.dotfiles.process-snapshot.plist"
+}
+
 setup_node_packages() {
     echo "Installing global Node.js packages..."
     npm install -g @anthropic-ai/claude-code
@@ -288,6 +363,8 @@ setup_node_packages
 setup_zsh_framework
 stow_packages
 setup_sublime
+setup_always_on
+setup_process_snapshot
 
 clone_tmux_plugin_manager
 

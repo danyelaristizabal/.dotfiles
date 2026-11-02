@@ -9,6 +9,8 @@ mkdir -p "$HOME/.config"
 
 for dir in */ ; do
     dirname="${dir%/}"
+    # system/ holds root-owned files that install.sh copies into place, not dotfiles
+    [[ "$dirname" == "system" ]] && continue
     if [[ -d "$dirname" ]]; then
         echo "Stowing $dirname..."
         stow --no-folding -t "$HOME" "$dirname"

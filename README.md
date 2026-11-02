@@ -36,6 +36,9 @@ flowchart TD
 .dotfiles/
 ├── arch/          # Arch Linux install script
 ├── macosx/        # macOS install script
+│   └── system/
+│       ├── always-on/         # keep the Mac awake + reachable while charging
+│       └── process-snapshot/  # minute-by-minute process/memory snapshot
 ├── gitconfig/     # Git configuration
 ├── gnupg/         # GPG configuration
 ├── nvim/          # Neovim configuration
@@ -134,3 +137,18 @@ To symlink dotfiles without reinstalling packages:
 cd ~/.dotfiles
 ./stow.sh
 ```
+
+## Always-on while charging (macOS)
+
+`install.sh` runs `setup_always_on`, configured from `macosx/system/always-on/`:
+
+- `pmset-charger.conf`: charger-only power settings (no system sleep, wake for network, auto-restart after a power cut). Battery settings are untouched.
+- `dotfiles-always-on.sh` + LaunchDaemon: every 30 s, disables sleep (lid closed too) while on the charger and restores it on battery. Unplugged with the lid shut, it puts the Mac to sleep. Log: `/var/log/dotfiles-always-on.log`.
+- Claude LaunchAgent: opens the Claude app in the background at login.
+
+While on the charger, Apple menu → Sleep does nothing. Unplug or run `sudo pmset -a disablesleep 0` to sleep manually.
+
+## Process snapshot (macOS)
+
+`setup_process_snapshot` installs a LaunchAgent that runs `macosx/system/process-snapshot/process-snapshot.sh` every minute. It writes `~/.dotfiles/.snapshots/processes.txt` (git-ignored) with memory totals, swap, memory pressure, the top processes by memory and CPU, and memory per app with its helper processes added up. You can check it while the screen is off or locked: `cat ~/.dotfiles/.snapshots/processes.txt`.
+
