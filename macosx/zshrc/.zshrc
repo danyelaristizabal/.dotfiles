@@ -153,3 +153,4 @@ export NVM_DIR="$HOME/.nvm"
 ASYNCAPI_AC_ZSH_SETUP_PATH=/Users/danyel/Library/Caches/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
 
 
+eval "$(fzf --zsh)"

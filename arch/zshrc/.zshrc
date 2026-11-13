@@ -18,7 +18,7 @@ export PATH=$PATH:$(go env GOPATH)/bin
 export EDITOR=nvim
 export ANTHROPIC_API_KEY=$(pass show anthropic)
 export OLLAMA_HOST="localhost:8080"
-export TERMINAL="wezterm"
+export TERMINAL="ghostty"
 export OPENAI_API_KEY=$(pass show openai)
 
 

@@ -6,10 +6,11 @@
 # --- CONFIGURATION ---
 DOTFILES_DIR="$HOME/.dotfiles"
 STOW_TARGET="$HOME"
-STOW_PACKAGES=(tmux gitconfig nvim wezterm zprofile zshrc)
+STOW_PACKAGES=(tmux gitconfig nvim ghostty zprofile zshrc)
 
 # Core packages available in official Arch repositories
 PACMAN_PACKAGES=(
+    "ghostty"
     "git"
     "go"
     "neovim"

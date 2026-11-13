@@ -18,6 +18,6 @@ source ~/.local/share/omarchy/default/bash/rc
 #
 export ANTHROPIC_API_KEY=$(pass show anthropic)
 export OLLAMA_HOST="localhost:8080"
-export TERMINAL="wezterm"
+export TERMINAL="ghostty"
 export OPENAI_API_KEY=$(pass show openai)
 export capath="$HOME/projects/cacharreo"

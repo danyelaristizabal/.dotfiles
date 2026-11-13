@@ -45,7 +45,6 @@ flowchart TD
 ├── tmux/          # Tmux configuration
 ├── zshrc/         # Zsh configuration
 ├── zprofile/      # Zsh profile
-├── wezterm/       # WezTerm configuration
 ├── ghostty/       # Ghostty configuration (macOS + Linux)
 └── stow.sh        # Stow all packages at once
 ```
