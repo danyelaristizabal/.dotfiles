@@ -80,6 +80,7 @@ BREW_PACKAGES=(
 
     "fzf" # fuzzy finder: ctrl+r for history, ctrl+t for files, alt+c for dirs
     "gemini-cli"
+    "herdr" # agent multiplexer: runs and manages multiple coding agents in the terminal
     "lazygit"
     "clippy" # pipes files to clipboard for clean GUI pastes: cat file.txt | clippy
 )
